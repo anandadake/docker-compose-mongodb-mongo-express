@@ -1,0 +1,95 @@
+version: '3.8'
+
+services:
+  mongo:
+    image: mongo:6
+    hostname: mongohost
+    env_file:
+      - .env
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
+    ports:
+      - ${MONGO_PORT}:27017
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test: ["CMD-SHELL", "mongosh --quiet --eval 'db.runCommand({ ping: 1 }).ok'"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  mongo-express:
+    image: mongo-express
+    env_file:
+      - .env
+    environment:
+      - ME_CONFIG_MONGODB_SERVER=mongohost
+      - ME_CONFIG_MONGODB_ADMINUSERNAME=${MONGO_INITDB_ROOT_USERNAME}
+      - ME_CONFIG_MONGODB_ADMINPASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
+      - ME_CONFIG_BASICAUTH_USERNAME=${MONGO_EXPRESS_USERNAME}
+      - ME_CONFIG_BASICAUTH_PASSWORD=${MONGO_EXPRESS_PASSWORD}
+    ports:
+      - ${MONGO_EXPRESS_PORT}:8081
+    depends_on:
+      mongo:
+        condition: service_healthy
+    user: root
+    volumes:
+      - ./entrypoint.sh:/entrypoint_custom.sh
+    entrypoint: /entrypoint_custom.sh
+
+volumes:
+  mongo_data:
+
+
+
+# version: '3.1'
+# services:
+#   mongo:
+#     image: mongo:6
+#     restart: always
+#     container_name: mongo
+#     environment:
+#       MONGO_INITDB_ROOT_USERNAME: root
+#       MONGO_INITDB_ROOT_PASSWORD: example
+#       # MONGO_INITDB_DATABASE: init
+#     volumes:
+#       - ./db_data/:/data/db/
+#       - /etc/timezone:/etc/timezone:ro
+#   mongo-express:
+#     image: mongo-express
+#     restart: always
+#     container_name: mongo_ui
+#     ports:
+#       - 5050:8081
+#     environment:
+#       ME_CONFIG_MONGODB_ADMINUSERNAME: root
+#       ME_CONFIG_MONGODB_ADMINPASSWORD: example
+#       ME_CONFIG_MONGODB_URL: mongodb://root:example@mongo:27017/
+#     depends_on:
+#       - mongo
+
+
+# mysql
+# version: "3.3"
+# services:
+#   db:
+#     image: mysql:5.7
+#     volumes:
+#       - ./db_data:/var/lib/mysql
+#     restart: always
+#     environment:
+#       MYSQL_ROOT_PASSWORD: password
+#       MYSQL_DATABASE: db
+#       MYSQL_PASSWORD: password
+#   phpmyadmin:
+#     depends_on:
+#       - db
+#     image: phpmyadmin/phpmyadmin
+#     restart: always
+#     ports:
+#       - "5050:80"
+#     environment:
+#       PMA_HOST: db
+#       MYSQL_ROOT_PASSWORD: password
