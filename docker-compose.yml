@@ -19,25 +19,25 @@ services:
       timeout: 5s
       retries: 3
 
-  mongo-express:
-    image: mongo-express
-    env_file:
-      - .env
-    environment:
-      - ME_CONFIG_MONGODB_SERVER=mongohost
-      - ME_CONFIG_MONGODB_ADMINUSERNAME=${MONGO_INITDB_ROOT_USERNAME}
-      - ME_CONFIG_MONGODB_ADMINPASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
-      - ME_CONFIG_BASICAUTH_USERNAME=${MONGO_EXPRESS_USERNAME}
-      - ME_CONFIG_BASICAUTH_PASSWORD=${MONGO_EXPRESS_PASSWORD}
-    ports:
-      - ${MONGO_EXPRESS_PORT}:8081
-    depends_on:
-      mongo:
-        condition: service_healthy
-    user: root
-    volumes:
-      - ./entrypoint.sh:/entrypoint_custom.sh
-    entrypoint: /entrypoint_custom.sh
+  # mongo-express:
+  #   image: mongo-express
+  #   env_file:
+  #     - .env
+  #   environment:
+  #     - ME_CONFIG_MONGODB_SERVER=mongohost
+  #     - ME_CONFIG_MONGODB_ADMINUSERNAME=${MONGO_INITDB_ROOT_USERNAME}
+  #     - ME_CONFIG_MONGODB_ADMINPASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
+  #     - ME_CONFIG_BASICAUTH_USERNAME=${MONGO_EXPRESS_USERNAME}
+  #     - ME_CONFIG_BASICAUTH_PASSWORD=${MONGO_EXPRESS_PASSWORD}
+  #   ports:
+  #     - ${MONGO_EXPRESS_PORT}:8081
+  #   depends_on:
+  #     mongo:
+  #       condition: service_healthy
+  #   user: root
+  #   volumes:
+  #     - ./entrypoint.sh:/entrypoint_custom.sh
+  #   entrypoint: /entrypoint_custom.sh
 
 volumes:
   mongo_data:
